@@ -2,46 +2,32 @@
 
 use Illuminate\Support\Facades\Route;
 
-// ------------------------------- - route view
 Route::get('/', function () {
     return view('welcome');
 });
 
-// -------------------------------- plain text routes
 Route::get('/hello', function () {
-    return 'Hello Laravel 12!';
+    return 'Hello, Sarfaraz!';
 });
 
-// -------------------------------- json response
-Route::get('/ping', function () {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'Laravel 12 is awesome!',
-        'timestamp' => now(),
-    ]);
+Route::get('/json', function () {
+    return response()->json(['name' => 'Sarfaraz', 'role' => 'Senior Engineer']);
 });
 
-// -------------------------------- route parameters (required)
 Route::get('/user/{id}', function (string $id) {
-    return "User ID: {$id}";
-});
+    return "User ID: $id";
+})->where('id', '[0-9]+');
 
-// -------------------------------- route parameters (optional)
 Route::get('/greet/{name?}', function (string $name = 'Guest') {
-    return "Hello, {$name}!";
-});
+    return "Hello, $name!";
+})->name('greet');
 
-// -------------------------------- named routes
-Route::get('/dashboard', function () {
-    return 'Dashboard Page';
-})->name('dashboard');
-
-// -------------------------------- route groups
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/home', function () {
-        return 'Admin Home Page';
-    });
-    Route::get('/settings', function () {
-        return 'Admin Settings Page';
-    });
+    Route::get('/dashboard', fn() => 'Admin Dashboard')->name('dashboard');
+    Route::get('/users', fn() => 'Admin Users')->name('users');
 });
+
+Route::get('/articles', fn() => 'List articles');
+Route::post('/articles', fn() => 'Create article');
+
+Route::fallback(fn() => response()->json(['message' => 'Not Found'], 404));
